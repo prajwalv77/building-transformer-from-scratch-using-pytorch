@@ -75,21 +75,21 @@ class MultiHeadAttentionBlock(nn.Module):
         self.w_v = nn.Linear(d_model, d_model)
 
         self.w_o = nn.Linear(d_model, d_model)
-        self.droupout = nn.Droupout(droupout)
+        self.dropout = nn.Dropout(dropout)
 
 
-    @statimethod
-    def attention(query, key, value, mask , droupout: nn.Droupout ):
+    @staticmethod
+    def attention(query, key, value, mask , dropout: nn.Droupout ):
         d_k = query.shape[-1]
 
         attention_scores = (query @ key.transpose(-2, -1)) / math.sqrt(d_k)
         if mask is not None:
-            attention_scores = masked_fill(mask == 0, -1e9)
+            attention_scores = attention_scores.masked_fill_(mask == 0, -1e9)
         attention_scores = attention_scores.softmax(dim = -1)
-        if droupout is not None:
-            attention_scores = droupout(attention_scores)
+        if dropout is not None:
+            attention_scores = dropout(attention_scores)
 
-        return attention_scores @ value), attention_scores
+        return attention_scores @ value, attention_scores
 
 
     def forward(self, q, k, v, mask):
@@ -111,7 +111,7 @@ class MultiHeadAttentionBlock(nn.Module):
 
 class ResidualConnection(nn.Module):
 
-    def __init__(self, droupout: float) -> None;
+    def __init__(self, dropout: float) -> None:
         super().__init__()
         self.dropout = nn.Dropout(dropout)
         self.norm  = LayerNormalization()
@@ -129,7 +129,7 @@ class EncoderBlock(nn.Module):
         self.residual_connections = nn.ModuleList([ResidualConnection(dropout) for _ in range(2)])
 
     def forward(self, x, src_mask):
-        x = self.residual_connections[0](x, lamda x: self.self_attention_block(x, x, x, src_mask))
+        x = self.residual_connections[0](x, lambda x: self.self_attention_block(x, x, x, src_mask))
         x = self.residual_connections[1](x, self.feed_forward_block)
         return x 
 
@@ -137,16 +137,17 @@ class EncoderBlock(nn.Module):
 class Encoder(nn.Module):
 
     def __init__(self, layers: nn.ModuleList) -> None:
-        super__init__()
+        super().__init__()
         self.layers = layers
         self.norm = LayerNormalization()
 
     def forward(self, x, mask):
         for layer in self.layers:
-            x = layers(x, mask)
+            x = layer(x, mask)
         return self.norm(x)
 
 class DecoderBlock(nn.Module):
+
     
 
 
@@ -159,5 +160,4 @@ class DecoderBlock(nn.Module):
 
         
 
-
-        
+ 
