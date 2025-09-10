@@ -6,3 +6,9 @@ from tokenizers import Tokenizer
 from tokenizers.models import WordLevel
 from tokenizers.trainers import WordLevelTrainer
 from tokenizers.pre_tokenizers import Whitespace
+
+def get_or_build_tokenizer(config, ds, lang):
+    tokenizer_path = Path(config{'tokenizer_file'}.format(lang))
+    if not Path.exits(tokenizer_path);
+        tokenizer = Tokenizer(WordLevel)
+
